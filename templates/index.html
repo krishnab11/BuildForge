@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuildForge - AI-Powered Full-Stack Builder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --gray: #9ca3af;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f3f4f6;
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(120deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .logo i {
+            font-size: 1.8rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+        
+        nav a:hover {
+            opacity: 0.8;
+        }
+        
+        .header-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: white;
+            color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background-color: white;
+            padding: 1.5rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .component-item {
+            background-color: var(--light);
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.2s;
+        }
+        
+        .component-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-color: var(--primary);
+        }
+        
+        .component-item i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Main Canvas Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            overflow: auto;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .toolbar-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .canvas-container {
+            flex: 1;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: auto;
+            position: relative;
+            min-height: 500px;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .canvas {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            padding: 2rem;
+        }
+        
+        /* Right Panel Styles */
+        .right-panel {
+            width: 320px;
+            background-color: white;
+            padding: 1.5rem;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+        }
+        
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1.5rem;
+        }
+        
+        .panel-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            border-bottom: 2px solid transparent;
+        }
+        
+        .panel-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .ai-assistant {
+            background-color: #f0f9ff;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .ai-header i {
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+        
+        .ai-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .ai-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+        }
+        
+        /* Component Styles */
+        .website-component {
+            border: 1px dashed #e5e7eb;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            position: relative;
+        }
+        
+        .component-controls {
+            position: absolute;
+            top: -15px;
+            right: 10px;
+            background: white;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .website-component:hover .component-controls {
+            display: flex;
+        }
+        
+        .component-controls button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--dark);
+            padding: 0.25rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(120deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar, .right-panel {
+                width: 100%;
+            }
+            
+            .sidebar {
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+            
+            .right-panel {
+                order: 3;
+            }
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-rocket"></i>
+            <span>BuildForge</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Templates</a></li>
+                <li><a href="#">Documentation</a></li>
+                <li><a href="#">Community</a></li>
+            </ul>
+        </nav>
+        <div class="header-buttons">
+            <button class="btn btn-outline">Sign In</button>
+            <button class="btn btn-primary">Get Started</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-layer-group"></i> Components</h3>
+                <div class="components-grid">
+                    <div class="component-item" draggable="true">
+                        <i class="fas fa-heading"></i>
+                        <div>Header</div>
+                    </div>
+                    <div class="component-item" draggable="true">
+                        <i class="fas fa-image"></i>
+                        <div>Hero</div>
+                    </div>
+                    <div class="component-item" draggable="true">
+                        <i class="fas fa-paragraph"></i>
+                        <div>Text</div>
+                    </div>
+                    <div class="component-item" draggable="true">
+                        <i class="fas fa-th"></i>
+                        <div>Grid</div>
+                    </div>
+                    <div class="component-item" draggable="true">
+                        <i class="fas fa-form"></i>
+                        <div>Form</div>
+                    </div>
+                    <div class="component-item" draggable="true">
+                        <i class="fas fa-video"></i>
+                        <div>Video</div>
+                    </div>
+                    <div class="component-item" draggable="true">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>Map</div>
+                    </div>
+                    <div class="component-item" draggable="true">
+                        <i class="fas fa-shopping-cart"></i>
+                        <div>Product</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-database"></i> Backend</h3>
+                <div class="components-grid">
+                    <div class="component-item">
+                        <i class="fas fa-table"></i>
+                        <div>Database</div>
+                    </div>
+                    <div class="component-item">
+                        <i class="fas fa-key"></i>
+                        <div>Auth</div>
+                    </div>
+                    <div class="component-item">
+                        <i class="fas fa-bolt"></i>
+                        <div>API</div>
+                    </div>
+                    <div class="component-item">
+                        <i class="fas fa-cloud"></i>
+                        <div>Storage</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-paint-brush"></i> Styles</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Primary Color</span>
+                        <input type="color" value="#6366f1">
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Font Family</span>
+                        <select>
+                            <option>Inter</option>
+                            <option>Roboto</option>
+                            <option>Open Sans</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Rounded Corners</span>
+                        <input type="range" min="0" max="1" step="0.1" value="0.5">
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="toolbar">
+                <h2>My Project</h2>
+                <div class="toolbar-actions">
+                    <button class="btn btn-outline"><i class="fas fa-eye"></i> Preview</button>
+                    <button class="btn btn-outline"><i class="fas fa-code"></i> View Code</button>
+                    <button class="btn btn-primary"><i class="fas fa-bolt"></i> Generate & Deploy</button>
+                </div>
+            </div>
+            
+            <div class="canvas-container">
+                <div class="canvas">
+                    <div class="website-component">
+                        <div class="component-controls">
+                            <button><i class="fas fa-cog"></i></button>
+                            <button><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="hero-section">
+                            <h1>Welcome to My Startup</h1>
+                            <p>We're changing the world with innovative solutions</p>
+                            <button class="btn btn-primary" style="margin-top: 1rem;">Get Started</button>
+                        </div>
+                    </div>
+                    
+                    <div class="website-component">
+                        <div class="component-controls">
+                            <button><i class="fas fa-cog"></i></button>
+                            <button><i class="fas fa-trash"></i></button>
+                        </div>
+                        <h2>About Us</h2>
+                        <p>We are a team of passionate individuals dedicated to creating products that make a difference. Our mission is to simplify technology for everyone.</p>
+                    </div>
+                    
+                    <div class="website-component">
+                        <div class="component-controls">
+                            <button><i class="fas fa-cog"></i></button>
+                            <button><i class="fas fa-trash"></i></button>
+                        </div>
+                        <h2>Contact Form</h2>
+                        <form style="display: grid; gap: 1rem; margin-top: 1rem;">
+                            <input type="text" placeholder="Your Name" style="padding: 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.375rem;">
+                            <input type="email" placeholder="Your Email" style="padding: 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.375rem;">
+                            <textarea placeholder="Your Message" rows="3" style="padding: 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.375rem;"></textarea>
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="right-panel">
+            <div class="panel-tabs">
+                <div class="panel-tab active">Properties</div>
+                <div class="panel-tab">Layers</div>
+                <div class="panel-tab">AI Assistant</div>
+            </div>
+            
+            <div class="properties-panel">
+                <h3>Selected Component</h3>
+                <div style="margin-top: 1rem;">
+                    <div style="margin-bottom: 1rem;">
+                        <label>Background Color</label>
+                        <input type="color" value="#6366f1" style="width: 100%;">
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label>Padding</label>
+                        <input type="range" min="0" max="5" step="0.5" value="3" style="width: 100%;">
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label>Text Color</label>
+                        <input type="color" value="#ffffff" style="width: 100%;">
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label>Border Radius</label>
+                        <input type="range" min="0" max="1" step="0.1" value="0.5" style="width: 100%;">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ai-assistant">
+                <div class="ai-header">
+                    <i class="fas fa-robot"></i>
+                    <h3>AI Assistant</h3>
+                </div>
+                <p>Need help? Ask our AI assistant to generate components, fix issues, or write backend logic.</p>
+                <div class="ai-input">
+                    <input type="text" placeholder="Ask for help...">
+                    <button class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+            
+            <div style="margin-top: 1.5rem;">
+                <h3>Deployment</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
+                    <button class="btn btn-outline"><i class="fab fa-google"></i> Deploy to Firebase</button>
+                    <button class="btn btn-outline"><i class="fab fa-aws"></i> Deploy to AWS</button>
+                    <button class="btn btn-outline"><i class="fas fa-server"></i> Deploy to Vercel</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Deployment Modal -->
+    <div class="modal" id="deployModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Deploy Your Application</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div>
+                <p>We're generating your full-stack code and preparing for deployment.</p>
+                <div style="display: flex; margin-top: 1.5rem;">
+                    <div style="flex: 1; text-align: center;">
+                        <i class="fas fa-code" style="font-size: 2rem; color: var(--primary);"></i>
+                        <p>Generating Frontend</p>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <i class="fas fa-server" style="font-size: 2rem; color: var(--primary);"></i>
+                        <p>Building Backend</p>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <i class="fas fa-database" style="font-size: 2rem; color: var(--primary);"></i>
+                        <p>Setting up Database</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">Deploy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2023 BuildForge - AI-Powered Full-Stack Builder for Non-Technical Founders</p>
+    </footer>
+
+    <script>
+    // API base URL
+    const API_BASE = 'http://localhost:5000/api';
+    
+    // Current project state
+    let currentProject = null;
+    let selectedComponent = null;
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create a new project on load (in a real app, you might load existing projects)
+        createNewProject('My Project');
+        
+        // Set up event listeners
+        setupEventListeners();
+    });
+
+    // Set up all event listeners
+    function setupEventListeners() {
+        // Drag and drop functionality
+        const componentItems = document.querySelectorAll('.component-item');
+        const canvas = document.querySelector('.canvas');
+        
+        componentItems.forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', item.querySelector('div').textContent);
+            });
+        });
+        
+        canvas.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+        
+        canvas.addEventListener('drop', function(e) {
+            e.preventDefault();
+            const componentType = e.dataTransfer.getData('text/plain');
+            addComponentToProject(componentType, e.clientX, e.clientY);
+        });
+        
+        // Modal functionality
+        const deployBtn = document.querySelector('.toolbar-actions .btn-primary');
+        const modal = document.getElementById('deployModal');
+        const closeModal = document.querySelector('.modal-close');
+        
+        deployBtn.addEventListener('click', function() {
+            modal.style.display = 'flex';
+            generateCode();
+        });
+        
+        closeModal.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+        
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+        
+        // AI Assistant
+        const aiButton = document.querySelector('.ai-input button');
+        const aiInput = document.querySelector('.ai-input input');
+        
+        aiButton.addEventListener('click', function() {
+            const prompt = aiInput.value;
+            if (prompt) {
+                callAIAssistant(prompt);
+                aiInput.value = '';
+            }
+        });
+        
+        aiInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const prompt = aiInput.value;
+                if (prompt) {
+                    callAIAssistant(prompt);
+                    aiInput.value = '';
+                }
+            }
+        });
+        
+        // Deployment buttons
+        const deployButtons = document.querySelectorAll('.right-panel .btn-outline');
+        deployButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const platform = this.textContent.toLowerCase().replace('deploy to ', '');
+                deployProject(platform);
+            });
+        });
+    }
+
+    // API Functions
+    async function createNewProject(name) {
+        try {
+            const response = await fetch(`${API_BASE}/projects`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name })
+            });
+            
+            currentProject = await response.json();
+            console.log('Project created:', currentProject);
+        } catch (error) {
+            console.error('Error creating project:', error);
+        }
+    }
+
+    async function addComponentToProject(type, x, y) {
+        if (!currentProject) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/projects/${currentProject.id}/components`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    type,
+                    properties: { x, y }
+                })
+            });
+            
+            const component = await response.json();
+            
+            // Create visual component on canvas
+            const canvas = document.querySelector('.canvas');
+            const newComponent = document.createElement('div');
+            newComponent.className = 'website-component';
+            newComponent.dataset.id = component.id;
+            newComponent.innerHTML = `
+                <div class="component-controls">
+                    <button><i class="fas fa-cog"></i></button>
+                    <button class="delete-btn"><i class="fas fa-trash"></i></button>
+                </div>
+                <h3>New ${type}</h3>
+                <p>This is a newly added ${type.toLowerCase()} component.</p>
+            `;
+            
+            // Position the component near where it was dropped
+            newComponent.style.position = 'absolute';
+            newComponent.style.left = `${x - 100}px`;
+            newComponent.style.top = `${y - 50}px`;
+            
+            canvas.appendChild(newComponent);
+            
+            // Add event listener for the delete button
+            const deleteBtn = newComponent.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', function() {
+                deleteComponent(component.id, newComponent);
+            });
+            
+            // Add to current project
+            currentProject.components.push(component);
+            
+        } catch (error) {
+            console.error('Error adding component:', error);
+        }
+    }
+
+    async function deleteComponent(componentId, element) {
+        if (!currentProject) return;
+        
+        try {
+            await fetch(`${API_BASE}/projects/${currentProject.id}/components/${componentId}`, {
+                method: 'DELETE'
+            });
+            
+            // Remove from DOM
+            element.remove();
+            
+            // Remove from current project
+            currentProject.components = currentProject.components.filter(c => c.id !== componentId);
+            
+        } catch (error) {
+            console.error('Error deleting component:', error);
+        }
+    }
+
+    async function generateCode() {
+        if (!currentProject) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/generate-code`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    project_id: currentProject.id
+                })
+            });
+            
+            const code = await response.json();
+            console.log('Generated code:', code);
+            
+            // In a real app, you would display this code in the modal
+            alert('Code generation complete! Check the console for details.');
+            
+        } catch (error) {
+            console.error('Error generating code:', error);
+        }
+    }
+
+    async function deployProject(platform) {
+        if (!currentProject) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/deploy`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    project_id: currentProject.id,
+                    platform
+                })
+            });
+            
+            const result = await response.json();
+            alert(`Deployment status: ${result.status}\n${result.message}\nURL: ${result.url}`);
+            
+        } catch (error) {
+            console.error('Error deploying project:', error);
+        }
+    }
+
+    async function callAIAssistant(prompt) {
+        if (!currentProject) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/ai-assistant`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    project_id: currentProject.id,
+                    prompt
+                })
+            });
+            
+            const result = await response.json();
+            alert(`AI Assistant: ${result.response}`);
+            
+        } catch (error) {
+            console.error('Error calling AI assistant:', error);
+        }
+    }
+</script>
+</body>
+</html>

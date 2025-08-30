@@ -1,0 +1,6 @@
+# requirements.txt (updated)
+Flask==2.3.3
+Flask-CORS==4.0.0
+Flask-JWT-Extended==4.5.2
+Flask-Bcrypt==1.0.1
+pymongo==2.7.0
